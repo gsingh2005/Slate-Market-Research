@@ -1,0 +1,21 @@
+* text=auto eol=lf
+
+# Keep binary and database assets out of text normalization.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.db binary
+*.sqlite binary
+*.sqlite3 binary
+*.pkl binary
+*.joblib binary
+*.onnx binary
+

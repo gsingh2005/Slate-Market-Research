@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS watchlists (
+  id VARCHAR(64) PRIMARY KEY,
+  name VARCHAR(120) NOT NULL,
+  symbols TEXT NOT NULL DEFAULT ''
+);
+

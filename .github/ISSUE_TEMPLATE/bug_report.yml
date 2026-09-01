@@ -1,0 +1,39 @@
+name: Bug report
+description: Report a reproducible problem without sensitive data.
+title: "bug: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "Do not include credentials, private URLs, account details, or unredacted logs. Report security vulnerabilities privately instead."
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Include the smallest reproducible sequence.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: "OS, Python, Node, browser, and app version"
+    validations:
+      required: true
+  - type: input
+    id: provider
+    attributes:
+      label: Data provider and mode
+      placeholder: "deterministic sample, CSV, or configured provider (no keys)"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized logs or screenshots
+      description: Remove all secrets and personally identifying information.
+

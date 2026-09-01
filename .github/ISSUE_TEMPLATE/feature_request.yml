@@ -1,0 +1,25 @@
+name: Feature request
+description: Propose a focused product improvement.
+title: "feature: "
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: "Do not include provider credentials, private account data, or security vulnerabilities in this form."
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and proposed outcome
+    validations:
+      required: true
+  - type: textarea
+    id: data
+    attributes:
+      label: Data-provider and licensing considerations
+      description: Identify any source, terms, rate-limit, or attribution impact. Never include keys.
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Include deterministic test or demo behavior where possible.
+

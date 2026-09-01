@@ -1,0 +1,10 @@
+{
+  "name": "slate-market-research",
+  "private": true,
+  "scripts": {
+    "dev:web": "npm --prefix apps/web run dev",
+    "build:web": "npm --prefix apps/web run build",
+    "test:web": "npm --prefix apps/web run lint"
+  }
+}
+
