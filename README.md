@@ -100,7 +100,7 @@ npm --prefix apps/web run format:check
 npm --prefix apps/web run lint
 npm --prefix apps/web run typecheck
 npm --prefix apps/web test
-npm --prefix apps/web run build:pages
+npm --prefix apps/web run build
 ```
 
 CI runs these checks without live provider calls. It uses deterministic sample data and safe mock public URLs.

@@ -46,7 +46,7 @@ Open `http://localhost:8000` to verify navigation, theme selection, charts, data
 
 1. Create a Render Blueprint from this repository and select `render.yaml` at the repository root.
 2. Confirm it creates one Docker Web Service named `slate-market-research`. Its Docker context is the repository root and its health check is `/health`.
-3. Leave `NEXT_PUBLIC_API_URL` unset. The Docker build uses same-origin API requests and does not use the GitHub Pages `/Slate-Market-Research` base path.
+3. Leave `NEXT_PUBLIC_API_URL` unset. The Docker build uses same-origin API requests from `/`.
 4. Set optional provider credentials only in the Render service's environment-variable settings: `ALPHA_VANTAGE_API_KEY`, `FRED_API_KEY`, and `SEC_USER_AGENT`. Do not add them to the repository, Dockerfile, build arguments, or browser variables.
 5. Deploy and verify `https://your-service.onrender.com/health`, `https://your-service.onrender.com/ready`, `https://your-service.onrender.com/`, and `https://your-service.onrender.com/research/`.
 
@@ -69,7 +69,3 @@ Render supplies `$PORT`; the Docker command binds Uvicorn to it. Do not replace 
 | `SEC_USER_AGENT` | optional non-secret | Organization contact for an implemented SEC client. |
 
 The initial SQLite database lives in the container's temporary filesystem. It is nonpersistent: watchlists and other local state can disappear after a restart, redeploy, or instance replacement. This is intentional for a demo deployment. To add persistence later, set `DATABASE_URL` to a managed PostgreSQL connection string and run the reviewed migration workflow before relying on stored data.
-
-## GitHub Pages note
-
-The existing GitHub Pages build remains available for its separate deployment workflow. It uses `GITHUB_PAGES=true`, its repository base path, and a public `NEXT_PUBLIC_API_URL`. Do not use those settings for the single-service Render deployment.

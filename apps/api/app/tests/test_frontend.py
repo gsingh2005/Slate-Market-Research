@@ -1,6 +1,6 @@
+from dataclasses import replace
 from pathlib import Path
 
-from dataclasses import replace
 from fastapi.testclient import TestClient
 
 from app import main

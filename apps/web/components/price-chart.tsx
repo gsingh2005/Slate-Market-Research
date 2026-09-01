@@ -3,6 +3,8 @@
 import { ColorType, createChart } from "lightweight-charts";
 import { useEffect, useState } from "react";
 
+import { getChartTheme } from "../lib/chart-theme";
+
 type Bar = {
   date: string;
   open: number;
@@ -11,19 +13,6 @@ type Bar = {
   close: number;
   volume: number;
 };
-
-function colors() {
-  const style = getComputedStyle(document.documentElement);
-  return {
-    accent: style.getPropertyValue("--accent").trim(),
-    grid: style.getPropertyValue("--chart-grid").trim(),
-    muted: style.getPropertyValue("--muted").trim(),
-    negative: style.getPropertyValue("--negative").trim(),
-    positive: style.getPropertyValue("--positive").trim(),
-    surface: style.getPropertyValue("--surface").trim(),
-    text: style.getPropertyValue("--text-secondary").trim(),
-  };
-}
 
 export function normalizedBars(bars: Bar[]) {
   const byDate = new Map<string, Bar>();
@@ -51,12 +40,12 @@ export function PriceChart({ bars, sma }: { bars: Bar[]; sma: (number | null)[] 
     const normalized = normalizedBars(bars);
     const container = document.getElementById("primary-price-chart");
     if (!container || normalized.length === 0 || !theme) return;
-    const token = colors();
+    const token = getChartTheme(theme);
     const chart = createChart(container, {
       height: 380,
       width: container.clientWidth,
       layout: {
-        background: { type: ColorType.Solid, color: token.surface },
+        background: { type: ColorType.Solid, color: token.background },
         textColor: token.text,
       },
       grid: {
@@ -64,11 +53,11 @@ export function PriceChart({ bars, sma }: { bars: Bar[]; sma: (number | null)[] 
         horzLines: { color: token.grid },
       },
       crosshair: {
-        vertLine: { color: token.muted },
-        horzLine: { color: token.muted },
+        vertLine: { color: token.crosshair },
+        horzLine: { color: token.crosshair },
       },
-      rightPriceScale: { borderColor: token.grid },
-      timeScale: { borderColor: token.grid },
+      rightPriceScale: { borderColor: token.border },
+      timeScale: { borderColor: token.border },
     });
     const ohlc = normalized.map((bar) => ({
       time: bar.date,
@@ -84,28 +73,28 @@ export function PriceChart({ bars, sma }: { bars: Bar[]; sma: (number | null)[] 
     if (style === "candles")
       chart
         .addCandlestickSeries({
-          upColor: token.positive,
-          downColor: token.negative,
+          upColor: token.bullish,
+          downColor: token.bearish,
           borderVisible: false,
-          wickUpColor: token.positive,
-          wickDownColor: token.negative,
+          wickUpColor: token.bullish,
+          wickDownColor: token.bearish,
         })
         .setData(ohlc);
     else if (style === "bar")
-      chart.addBarSeries({ upColor: token.positive, downColor: token.negative }).setData(ohlc);
+      chart.addBarSeries({ upColor: token.bullish, downColor: token.bearish }).setData(ohlc);
     else if (style === "area")
       chart
         .addAreaSeries({
           lineColor: token.accent,
-          topColor: `${token.accent}66`,
-          bottomColor: `${token.accent}08`,
+          topColor: token.areaTop,
+          bottomColor: token.areaBottom,
         })
         .setData(close);
     else if (style === "baseline")
       chart
         .addBaselineSeries({
-          topLineColor: token.positive,
-          bottomLineColor: token.negative,
+          topLineColor: token.bullish,
+          bottomLineColor: token.bearish,
           baseValue: { type: "price", price: normalized[0].close },
         })
         .setData(close);

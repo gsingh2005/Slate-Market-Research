@@ -1,4 +1,4 @@
-from app.analytics import historical_scenarios, risk_statistics, ema, rsi, sma
+from app.analytics import ema, historical_scenarios, risk_statistics, rsi, sma
 from app.sample_data import bars_for
 
 

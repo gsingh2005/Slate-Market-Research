@@ -111,26 +111,38 @@ def _percentile(values: list[float], percentile: float) -> float | None:
     ordered = sorted(values)
     index = (len(ordered) - 1) * percentile
     lower, upper = math.floor(index), math.ceil(index)
-    return ordered[lower] if lower == upper else ordered[lower] + (ordered[upper] - ordered[lower]) * (index - lower)
+    return (
+        ordered[lower]
+        if lower == upper
+        else ordered[lower] + (ordered[upper] - ordered[lower]) * (index - lower)
+    )
 
 
 def risk_statistics(bars: list[Bar], benchmark: list[Bar]) -> dict[str, float | None]:
     """Descriptive daily-return statistics using 252 trading days per year."""
     closes = [bar.adjusted_close for bar in bars]
     daily = [value for value in returns(closes) if value is not None]
-    benchmark_daily = [value for value in returns([bar.adjusted_close for bar in benchmark]) if value is not None]
+    benchmark_daily = [
+        value for value in returns([bar.adjusted_close for bar in benchmark]) if value is not None
+    ]
     paired = list(zip(daily[-len(benchmark_daily) :], benchmark_daily[-len(daily) :]))
     mean_daily = _mean(daily)
     volatility = _standard_deviation(daily)
     downside = _standard_deviation([min(value, 0) for value in daily])
     total_return = closes[-1] / closes[0] - 1 if len(closes) > 1 else None
     years = len(daily) / 252
-    annualized_return = (1 + total_return) ** (1 / years) - 1 if total_return is not None and years else None
+    annualized_return = (
+        (1 + total_return) ** (1 / years) - 1 if total_return is not None and years else None
+    )
     drawdown = max_drawdown(closes) if closes else None
     current_drawdown = closes[-1] / max(closes) - 1 if closes else None
     market_mean = _mean([market for _, market in paired])
     market_variance = _mean((market - market_mean) ** 2 for _, market in paired) if paired else 0
-    covariance = _mean((asset - mean_daily) * (market - market_mean) for asset, market in paired) if paired else 0
+    covariance = (
+        _mean((asset - mean_daily) * (market - market_mean) for asset, market in paired)
+        if paired
+        else 0
+    )
     beta = covariance / market_variance if market_variance else None
     correlation = (
         covariance / (volatility * _standard_deviation([market for _, market in paired]))
@@ -152,12 +164,16 @@ def risk_statistics(bars: list[Bar], benchmark: list[Bar]) -> dict[str, float | 
         "r_squared_vs_spy": correlation**2 if correlation is not None else None,
         "sharpe_ratio": (mean_daily / volatility * math.sqrt(252)) if volatility else None,
         "sortino_ratio": (mean_daily / downside * math.sqrt(252)) if downside else None,
-        "calmar_ratio": annualized_return / abs(drawdown) if annualized_return is not None and drawdown else None,
+        "calmar_ratio": annualized_return / abs(drawdown)
+        if annualized_return is not None and drawdown
+        else None,
         "max_drawdown": drawdown,
         "current_drawdown": current_drawdown,
         "value_at_risk_95": var_95,
         "conditional_value_at_risk_95": _mean(tail) if tail else None,
-        "positive_day_percentage": sum(value > 0 for value in daily) / len(daily) if daily else None,
+        "positive_day_percentage": sum(value > 0 for value in daily) / len(daily)
+        if daily
+        else None,
         "best_day_return": max(daily) if daily else None,
         "worst_day_return": min(daily) if daily else None,
     }
@@ -166,7 +182,9 @@ def risk_statistics(bars: list[Bar], benchmark: list[Bar]) -> dict[str, float | 
 def historical_scenarios(bars: list[Bar], horizon: int = 10) -> dict[str, float | int | str | None]:
     """Empirical overlapping return intervals, deliberately labeled as scenarios, not forecasts."""
     closes = [bar.adjusted_close for bar in bars]
-    outcomes = [closes[index] / closes[index - horizon] - 1 for index in range(horizon, len(closes))]
+    outcomes = [
+        closes[index] / closes[index - horizon] - 1 for index in range(horizon, len(closes))
+    ]
     return {
         "horizon_sessions": horizon,
         "lookback_sessions": len(closes),
