@@ -26,7 +26,7 @@ docs/                   Architecture notes
 .github/                CI, Dependabot, issue and pull-request templates
 ```
 
-The frontend calls versioned `/api/v1` endpoints. The API owns provider access, calculations, and persistence. Development uses SQLite; the SQLAlchemy layer supports PostgreSQL URLs for production. `SampleProvider` supplies reproducible synthetic data when offline mode is enabled.
+The frontend calls versioned `/api/v1` endpoints. In the Render deployment, FastAPI serves the exported frontend and API from one origin; local development keeps the Next.js and FastAPI servers separate. The API owns provider access, calculations, and persistence. Development and the initial Render demo use SQLite; the SQLAlchemy layer also supports PostgreSQL when persistent production data is needed. `SampleProvider` supplies reproducible synthetic data when offline mode is enabled.
 
 ## Data providers and licensing
 
@@ -75,7 +75,7 @@ The Compose setup runs the API in offline mode and exposes the UI on port 3000. 
 
 Copy `.env.example` and keep the resulting `.env` private. `NEXT_PUBLIC_API_URL` is intentionally browser-exposed and must contain only a credential-free API base URL. Provider credentials such as `ALPHA_VANTAGE_API_KEY`, `FRED_API_KEY`, and `SEC_USER_AGENT` are backend-only and optional.
 
-`APP_ENV=production` requires both `DATABASE_URL` and explicit `ALLOWED_ORIGINS`; wildcard origins are rejected at startup. Keep `SLATE_OFFLINE_MODE=true` for demos, tests, and CI. Live provider adapters remain disabled until implemented and configured.
+`APP_ENV=production` can use the documented temporary SQLite database for a disposable demo; configure PostgreSQL only when persistence is required. The single-service deployment does not use CORS because frontend and API share an origin. Keep `SLATE_OFFLINE_MODE=true` for demos, tests, and CI. Live provider adapters remain disabled until implemented and configured.
 
 ## Database and migrations
 
@@ -120,9 +120,9 @@ Use a focused branch, run the quality checks above, and describe data-source imp
 
 ## Deployment overview
 
-Build the API and web containers separately or with Docker Compose. Production deployment requires a managed database, explicit browser origins, HTTPS termination, observability, and a review of every live data provider's licensing and rate limits.
+Render deploys one multi-stage Docker image: Next.js exports static files during the build and FastAPI serves them together with `/api/v1`. The initial configuration uses temporary SQLite and deterministic data, so it does not require PostgreSQL. It is not persistent and is intended for demos only.
 
-GitHub Pages and Render deployment instructions are in [DEPLOYMENT.md](DEPLOYMENT.md).
+Copy-paste-ready local, Docker, and Render instructions are in [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ## Known limitations
 

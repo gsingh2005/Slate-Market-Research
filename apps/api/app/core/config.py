@@ -40,6 +40,7 @@ class Settings:
     log_level: str = os.getenv("LOG_LEVEL", "INFO").upper()
     provider_timeout_seconds: float = float(os.getenv("PROVIDER_TIMEOUT_SECONDS", "10"))
     provider_max_retries: int = int(os.getenv("PROVIDER_MAX_RETRIES", "2"))
+    frontend_dist_dir: str | None = os.getenv("SLATE_FRONTEND_DIST_DIR") or None
     seed_demo_data: bool = _truthy(
         os.getenv(
             "SLATE_SEED_DEMO_DATA",
@@ -48,15 +49,7 @@ class Settings:
     )
 
     def validate(self) -> None:
-        if self.environment == "production" and not (
-            os.getenv("DATABASE_URL") or os.getenv("SLATE_DATABASE_URL")
-        ):
-            raise RuntimeError("DATABASE_URL must be set when APP_ENV=production.")
-        if self.environment == "production" and not (
-            os.getenv("ALLOWED_ORIGINS") or os.getenv("SLATE_ALLOWED_ORIGINS")
-        ):
-            raise RuntimeError("ALLOWED_ORIGINS must be set when APP_ENV=production.")
-        if "*" in self.allowed_origins:
+        if self.environment != "production" and "*" in self.allowed_origins:
             raise RuntimeError(
                 "SLATE_ALLOWED_ORIGINS must use explicit origins; wildcard CORS is not supported."
             )

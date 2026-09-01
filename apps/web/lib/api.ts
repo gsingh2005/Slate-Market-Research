@@ -1,4 +1,6 @@
-const configuredBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const configuredBase =
+  process.env.NEXT_PUBLIC_API_URL ||
+  (process.env.NODE_ENV === "development" ? "http://localhost:8000" : "");
 const requestTimeoutMs = 12_000;
 
 export class ApiError extends Error {
@@ -19,9 +21,15 @@ export class ApiError extends Error {
   }
 }
 
-export const apiConfiguration = { origin: configuredBase.replace(/\/+$/, "") };
+export const apiConfiguration = {
+  origin: configuredBase.replace(/\/+$/, "") || "same origin",
+};
 
 function apiBase(): URL {
+  if (!configuredBase) {
+    if (typeof window !== "undefined") return new URL(window.location.origin);
+    throw new ApiError("The browser origin is unavailable while rendering.", "configuration");
+  }
   try {
     const url = new URL(configuredBase);
     const isLocalHttp =
@@ -32,7 +40,7 @@ function apiBase(): URL {
     return url;
   } catch {
     throw new ApiError(
-      "The deployed API URL is missing or invalid. Configure NEXT_PUBLIC_API_URL during the frontend build.",
+      "The configured API URL is invalid. Use a credential-free HTTPS URL.",
       "configuration",
     );
   }
