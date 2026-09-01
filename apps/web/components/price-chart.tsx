@@ -3,7 +3,14 @@
 import { ColorType, createChart } from "lightweight-charts";
 import { useEffect, useState } from "react";
 
-type Bar = { date: string; open: number; high: number; low: number; close: number; volume: number };
+type Bar = {
+  date: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+};
 
 function colors() {
   const style = getComputedStyle(document.documentElement);
@@ -32,6 +39,7 @@ export function normalizedBars(bars: Bar[]) {
 
 export function PriceChart({ bars, sma }: { bars: Bar[]; sma: (number | null)[] }) {
   const [theme, setTheme] = useState("dark");
+  const [style, setStyle] = useState<"candles" | "bar" | "line" | "area" | "baseline">("candles");
   const validBars = normalizedBars(bars);
   useEffect(() => {
     const update = () => setTheme(document.documentElement.dataset.theme || "dark");
@@ -51,28 +59,62 @@ export function PriceChart({ bars, sma }: { bars: Bar[]; sma: (number | null)[] 
         background: { type: ColorType.Solid, color: token.surface },
         textColor: token.text,
       },
-      grid: { vertLines: { color: token.grid }, horzLines: { color: token.grid } },
-      crosshair: { vertLine: { color: token.muted }, horzLine: { color: token.muted } },
+      grid: {
+        vertLines: { color: token.grid },
+        horzLines: { color: token.grid },
+      },
+      crosshair: {
+        vertLine: { color: token.muted },
+        horzLine: { color: token.muted },
+      },
       rightPriceScale: { borderColor: token.grid },
       timeScale: { borderColor: token.grid },
     });
-    const candles = chart.addCandlestickSeries({
-      upColor: token.positive,
-      downColor: token.negative,
-      borderVisible: false,
-      wickUpColor: token.positive,
-      wickDownColor: token.negative,
+    const ohlc = normalized.map((bar) => ({
+      time: bar.date,
+      open: bar.open,
+      high: bar.high,
+      low: bar.low,
+      close: bar.close,
+    }));
+    const close = normalized.map((bar) => ({
+      time: bar.date,
+      value: bar.close,
+    }));
+    if (style === "candles")
+      chart
+        .addCandlestickSeries({
+          upColor: token.positive,
+          downColor: token.negative,
+          borderVisible: false,
+          wickUpColor: token.positive,
+          wickDownColor: token.negative,
+        })
+        .setData(ohlc);
+    else if (style === "bar")
+      chart.addBarSeries({ upColor: token.positive, downColor: token.negative }).setData(ohlc);
+    else if (style === "area")
+      chart
+        .addAreaSeries({
+          lineColor: token.accent,
+          topColor: `${token.accent}66`,
+          bottomColor: `${token.accent}08`,
+        })
+        .setData(close);
+    else if (style === "baseline")
+      chart
+        .addBaselineSeries({
+          topLineColor: token.positive,
+          bottomLineColor: token.negative,
+          baseValue: { type: "price", price: normalized[0].close },
+        })
+        .setData(close);
+    else chart.addLineSeries({ color: token.accent, lineWidth: 2 }).setData(close);
+    const average = chart.addLineSeries({
+      color: token.accent,
+      lineWidth: 2,
+      lineStyle: 2,
     });
-    candles.setData(
-      normalized.map((bar) => ({
-        time: bar.date,
-        open: bar.open,
-        high: bar.high,
-        low: bar.low,
-        close: bar.close,
-      })),
-    );
-    const average = chart.addLineSeries({ color: token.accent, lineWidth: 2, lineStyle: 2 });
     average.setData(
       normalized.flatMap((bar) => {
         const index = bars.findIndex((item) => item.date === bar.date);
@@ -89,16 +131,35 @@ export function PriceChart({ bars, sma }: { bars: Bar[]; sma: (number | null)[] 
       resize.disconnect();
       chart.remove();
     };
-  }, [bars, sma, theme]);
+  }, [bars, sma, style, theme]);
   if (validBars.length === 0)
     return (
       <div className="chart-empty">No valid OHLC observations are available for this symbol.</div>
     );
   return (
-    <div
-      id="primary-price-chart"
-      className="w-full min-h-[380px]"
-      aria-label="Candlestick price chart"
-    />
+    <div>
+      <div className="mb-3 flex flex-wrap gap-2" aria-label="Chart style">
+        {(["candles", "bar", "line", "area", "baseline"] as const).map((choice) => (
+          <button
+            className="chart-choice"
+            aria-pressed={style === choice}
+            key={choice}
+            type="button"
+            onClick={() => setStyle(choice)}
+          >
+            {choice === "candles"
+              ? "Candles"
+              : choice === "bar"
+                ? "OHLC"
+                : choice[0].toUpperCase() + choice.slice(1)}
+          </button>
+        ))}
+      </div>
+      <div
+        id="primary-price-chart"
+        className="w-full min-h-[380px]"
+        aria-label={`${style} price chart`}
+      />
+    </div>
   );
 }

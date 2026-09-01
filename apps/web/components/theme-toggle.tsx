@@ -23,13 +23,15 @@ export function ThemeToggle() {
       type="button"
       className="theme-toggle"
       aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+      aria-pressed={theme === "dark"}
       onClick={() => {
         const next = theme === "dark" ? "light" : "dark";
         applyTheme(next);
         setTheme(next);
       }}
     >
-      <span aria-hidden="true">{theme === "dark" ? "Light" : "Dark"}</span>
+      <span aria-hidden="true">{theme === "dark" ? "☾" : "☀"}</span>
+      <span className="ml-1">{theme === "dark" ? "Dark" : "Light"}</span>
     </button>
   );
 }

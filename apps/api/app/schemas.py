@@ -1,5 +1,7 @@
 from datetime import date
 
+from typing import Any
+
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 
@@ -30,7 +32,7 @@ class ResearchSnapshot(BaseModel):
     metrics: dict[str, float | None]
     indicators: dict[str, list[float | None]]
     fundamentals: dict[str, float | str | None]
-    scores: dict[str, float | str]
+    scores: dict[str, Any]
     risks: list[str]
     data_notes: list[str]
 

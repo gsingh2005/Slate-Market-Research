@@ -52,7 +52,10 @@ export async function api<T>(path: string): Promise<T> {
   const timeout = window.setTimeout(() => controller.abort(), requestTimeoutMs);
   const url = new URL(`/api/v1/${path.replace(/^\/+/, "")}`, base);
   try {
-    const response = await fetch(url, { cache: "no-store", signal: controller.signal });
+    const response = await fetch(url, {
+      cache: "no-store",
+      signal: controller.signal,
+    });
     if (!response.ok) {
       throw new ApiError(
         response.status === 404
@@ -109,11 +112,18 @@ export type Research = {
     description: string;
     provider: string;
   };
-  bars: { date: string; open: number; high: number; low: number; close: number; volume: number }[];
+  bars: {
+    date: string;
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+    volume: number;
+  }[];
   metrics: Record<string, number>;
   indicators: Record<string, (number | null)[]>;
   fundamentals: Record<string, number | string>;
-  scores: Record<string, number | string>;
+  scores: Record<string, number | string | Record<string, number | string | null>>;
   risks: string[];
   data_notes: string[];
 };

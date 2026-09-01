@@ -4,41 +4,26 @@ const ideas = ["AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "JPM", "XOM", "SPY"];
 export default function Home() {
   return (
     <main>
-      <section className="grid gap-10 md:grid-cols-[1.25fr_.75fr]">
-        <div className="py-7">
-          <p className="label mb-4">Independent research terminal</p>
-          <h1 className="max-w-3xl font-['Instrument_Serif'] text-6xl leading-[.9] tracking-[-.055em] md:text-8xl">
-            Find signal.
-            <br />
-            <i>Keep context.</i>
-          </h1>
-          <p className="mt-7 max-w-xl text-base leading-7 text-[#6e7d75]">
-            A deliberate workspace for technical structure, fundamental checks, and evidence-aware
-            decision notes. It works locally with deterministic data from the first launch.
-          </p>
-          <div className="mt-8">
-            <SymbolSearch />
-          </div>
+      <section className="py-5 md:py-10">
+        <p className="label mb-4">Independent research workspace</p>
+        <h1 className="max-w-3xl text-5xl font-extrabold tracking-[-.055em] md:text-7xl">
+          Clear market research, with context.
+        </h1>
+        <p className="mt-5 max-w-xl text-base leading-7 muted">
+          Explore deterministic sample histories, price behavior, and plain-language risk context.
+          This is research software, not live market data or investment advice.
+        </p>
+        <div className="mt-8">
+          <SymbolSearch />
         </div>
-        <aside className="card relative overflow-hidden p-7">
-          <div className="absolute right-[-30px] top-[-35px] h-40 w-40 rounded-full bg-[#dbe8c8]" />
-          <p className="label relative">Today in Slate</p>
-          <p className="relative mt-7 font-['Instrument_Serif'] text-4xl leading-none">
-            Your research should explain its uncertainty.
-          </p>
-          <p className="relative mt-6 text-sm leading-6 text-[#6e7d75]">
-            Price history, scoring, and backtests label their source and limitations instead of
-            implying certainty.
-          </p>
-        </aside>
       </section>
       <section className="mt-12">
         <div className="mb-4 flex items-end justify-between">
           <div>
             <p className="label">Sample universe</p>
-            <h2 className="font-['Instrument_Serif'] text-4xl">Start with a name</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Start with a sample security</h2>
           </div>
-          <Link href="/screener" className="text-sm font-bold text-[#1f6b4f]">
+          <Link href="/screener" className="text-sm font-bold text-[var(--accent)]">
             Open screener
           </Link>
         </div>
@@ -50,7 +35,7 @@ export default function Home() {
               className="card p-4 transition hover:-translate-y-1"
             >
               <p className="mono text-lg">{symbol}</p>
-              <p className="mt-2 text-xs text-[#6e7d75]">Research view</p>
+              <p className="mt-2 text-xs muted">Research view</p>
             </Link>
           ))}
         </div>

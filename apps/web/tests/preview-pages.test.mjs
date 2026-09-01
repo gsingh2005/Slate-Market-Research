@@ -16,7 +16,11 @@ function request(port, path) {
         body += chunk;
       });
       response.on("end", () =>
-        resolve({ body, headers: response.headers, status: response.statusCode }),
+        resolve({
+          body,
+          headers: response.headers,
+          status: response.statusCode,
+        }),
       );
     }).on("error", reject);
   });

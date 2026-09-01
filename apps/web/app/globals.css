@@ -1,51 +1,50 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
   color-scheme: dark;
-  --page: #101923;
-  --surface: #172432;
-  --surface-hover: #203246;
-  --border: #2d4052;
-  --border-strong: #49647c;
-  --text: #e6edf3;
-  --text-secondary: #aebdca;
-  --muted: #8496a6;
-  --accent: #82b8df;
-  --accent-hover: #b2d7ef;
-  --positive: #83b9aa;
-  --negative: #d58b80;
-  --warning: #d6ae68;
-  --info: #82b8df;
-  --chart-grid: #263a4b;
-  --chart-crosshair: #8ca7ba;
-  --chart-tooltip: #182735;
-  --focus: #b2d7ef;
-  --shadow: #050b112b;
+  --page: #080b10;
+  --surface: #0d131c;
+  --elevated: #121b26;
+  --hover: #182433;
+  --border: #253244;
+  --border-strong: #35465a;
+  --text: #f1f5f9;
+  --secondary: #a7b3c4;
+  --muted: #748399;
+  --accent: #60a5fa;
+  --positive: #2dd4bf;
+  --negative: #fb7185;
+  --warning: #f59e0b;
+  --violet: #a78bfa;
+  --chart-grid: #253244;
+  --chart-crosshair: #a7b3c4;
+  --chart-tooltip: #121b26;
+  --focus: #60a5fa;
+  --shadow: #00000044;
 }
 :root[data-theme="light"] {
   color-scheme: light;
-  --page: #eeece6;
-  --surface: #fbfaf7;
-  --surface-hover: #f0f2f1;
-  --border: #d5d8d4;
-  --border-strong: #9da9ae;
-  --text: #1e2a33;
-  --text-secondary: #52616b;
-  --muted: #71808a;
-  --accent: #356f9a;
-  --accent-hover: #245878;
-  --positive: #2f7669;
-  --negative: #b65f55;
-  --warning: #9a6d24;
-  --info: #356f9a;
-  --chart-grid: #dde2df;
-  --chart-crosshair: #7f919c;
+  --page: #f4f7fb;
+  --surface: #ffffff;
+  --elevated: #edf2f7;
+  --hover: #e1eaf4;
+  --border: #cbd5e1;
+  --border-strong: #94a3b8;
+  --text: #172033;
+  --secondary: #43536b;
+  --muted: #62748c;
+  --accent: #2563eb;
+  --positive: #0f766e;
+  --negative: #be3455;
+  --warning: #a65f00;
+  --violet: #6d4cc9;
+  --chart-grid: #d9e2ed;
+  --chart-crosshair: #64748b;
   --chart-tooltip: #ffffff;
-  --focus: #356f9a;
-  --shadow: #1e2a3310;
+  --focus: #2563eb;
+  --shadow: #17203312;
 }
 * {
   box-sizing: border-box;
@@ -57,12 +56,13 @@ body {
   min-height: 100vh;
   margin: 0;
   background: radial-gradient(
-      circle at 85% -10%,
+      circle at 86% -15%,
       color-mix(in srgb, var(--accent) 12%, transparent),
-      transparent 32%
+      transparent 29%
     ), var(--page);
   color: var(--text);
-  font-family: Manrope, sans-serif;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.5;
 }
 a {
   color: inherit;
@@ -83,32 +83,35 @@ a:focus-visible {
   outline-offset: 3px;
 }
 .shell {
-  max-width: 1240px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 20px;
 }
 .brand {
-  font-family: "Instrument Serif", serif;
-  font-size: 32px;
-  letter-spacing: -.04em;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -.045em;
 }
 .mono,
 .metric {
-  font-family: "DM Mono", monospace;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-variant-numeric: tabular-nums;
 }
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  box-shadow: 0 10px 28px var(--shadow);
+  border-radius: 12px;
+  box-shadow: 0 12px 30px var(--shadow);
 }
 .label {
   color: var(--muted);
   font-size: 10px;
   font-weight: 800;
-  letter-spacing: .11em;
+  letter-spacing: .14em;
   text-transform: uppercase;
+}
+.muted {
+  color: var(--secondary);
 }
 .app-header,
 .app-footer {
@@ -116,31 +119,33 @@ a:focus-visible {
 }
 .nav-link {
   border-bottom: 2px solid transparent;
+  color: var(--secondary);
   padding: 7px 0;
-  color: var(--text-secondary);
 }
 .nav-link:hover {
   border-color: var(--accent);
   color: var(--text);
 }
 .metric {
-  font-size: 24px;
-  letter-spacing: -.05em;
+  color: var(--text);
+  font-size: 23px;
+  font-weight: 700;
+  letter-spacing: -.04em;
 }
 .theme-toggle,
-.status-badge {
+.status-badge,
+.chart-choice {
   border: 1px solid var(--border);
   border-radius: 999px;
-  background: var(--surface);
-  color: var(--text-secondary);
-  padding: 6px 10px;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: .08em;
-  text-transform: uppercase;
+  background: var(--elevated);
+  color: var(--secondary);
+  padding: 7px 10px;
+  font-size: 11px;
+  font-weight: 700;
 }
-.theme-toggle:hover {
-  background: var(--surface-hover);
+.theme-toggle:hover,
+.chart-choice:hover {
+  background: var(--hover);
   color: var(--text);
 }
 .status-badge {
@@ -152,12 +157,59 @@ a:focus-visible {
 .text-negative {
   color: var(--negative);
 }
-.muted {
-  color: var(--text-secondary);
-}
 .theme-surface {
-  background: var(--surface);
+  background: var(--elevated);
   border-color: var(--border);
+  color: var(--text);
+}
+.metric-strip {
+  display: grid;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--border);
+  gap: 1px;
+}
+.metric-strip > div {
+  background: var(--elevated);
+  padding: 16px;
+}
+.metric-strip > div:hover {
+  background: var(--hover);
+}
+.help {
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+}
+.help button {
+  display: grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--elevated);
+  color: var(--secondary);
+  font-size: 11px;
+  font-weight: 800;
+}
+.help-panel {
+  position: absolute;
+  z-index: 30;
+  left: 0;
+  top: 24px;
+  width: min(290px, 75vw);
+  padding: 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: 0 16px 36px var(--shadow);
+  color: var(--secondary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.help-panel strong {
   color: var(--text);
 }
 .chart-empty {
@@ -166,28 +218,28 @@ a:focus-visible {
   place-items: center;
   border: 1px dashed var(--border-strong);
   border-radius: 12px;
-  color: var(--text-secondary);
+  color: var(--secondary);
   font-size: 14px;
-  text-align: center;
   padding: 24px;
+  text-align: center;
 }
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
+    animation-duration: .01ms !important;
     scroll-behavior: auto !important;
     transition-duration: .01ms !important;
-    animation-duration: .01ms !important;
   }
 }
 @media (max-width: 640px) {
   .shell {
     padding: 14px;
   }
-  .brand {
-    font-size: 28px;
-  }
   .app-header {
     align-items: flex-start;
+  }
+  .metric-strip > div {
+    padding: 13px;
   }
 }

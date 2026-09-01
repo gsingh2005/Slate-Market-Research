@@ -4,7 +4,7 @@ from datetime import date
 from sqlalchemy.orm import Session
 
 from app.adapters import MarketDataProvider, SampleProvider
-from app.analytics import indicator_set, snapshot_metrics
+from app.analytics import historical_scenarios, indicator_set, snapshot_metrics
 from app.models import Watchlist
 from app.sample_data import available_symbols
 from app.schemas import BacktestInput, ResearchSnapshot, WatchlistInput, WatchlistOutput
@@ -26,6 +26,10 @@ def research(symbol: str) -> ResearchSnapshot:
         100, max(0, 50 + metrics["return_3m"] * 180 + (10 if bars[-1].close > sma_50 else -10))
     )
     bottom_probability = min(90, max(5, 54 - (last_rsi - 30) * 0.6 - metrics["return_1m"] * 150))
+    trend = 35 if bars[-1].close > sma_50 else -35
+    momentum_evidence = min(30, max(-30, (metrics["return_3m"] or 0) * 180))
+    rsi_evidence = min(20, max(-20, (last_rsi - 50) * 0.5))
+    directional_evidence = round(trend + momentum_evidence + rsi_evidence, 1)
     risks = [
         "Sample mode uses deterministic synthetic history and should not be treated as a "
         "market quote.",
@@ -42,12 +46,30 @@ def research(symbol: str) -> ResearchSnapshot:
         scores={
             "momentum_score": round(momentum, 1),
             "potential_bottom_probability": round(bottom_probability, 1),
-            "regime": "Constructive" if bars[-1].close > sma_50 else "Caution",
+            "market_condition": "Rising market condition"
+            if bars[-1].close > sma_50
+            else "Falling market condition",
             "rsi_signal": "Oversold"
             if last_rsi < 30
             else "Overbought"
             if last_rsi > 70
             else "Neutral",
+            "directional_evidence": directional_evidence,
+            "directional_evidence_label": "Strongly bullish"
+            if directional_evidence >= 55
+            else "Bullish"
+            if directional_evidence >= 20
+            else "Mixed"
+            if directional_evidence > -20
+            else "Bearish"
+            if directional_evidence > -55
+            else "Strongly bearish",
+            "trend_contribution": trend,
+            "momentum_contribution": round(momentum_evidence, 1),
+            "rsi_contribution": round(rsi_evidence, 1),
+            "scenario_5": historical_scenarios(bars, 5),
+            "scenario_10": historical_scenarios(bars, 10),
+            "scenario_20": historical_scenarios(bars, 20),
         },
         risks=risks,
         data_notes=[
