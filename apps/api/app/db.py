@@ -9,10 +9,16 @@ if settings.database_url.startswith("sqlite:///"):
     database_path = Path(settings.database_url.removeprefix("sqlite:///"))
     database_path.parent.mkdir(parents=True, exist_ok=True)
 
-engine = create_engine(
-    settings.database_url,
-    connect_args={"check_same_thread": False} if settings.database_url.startswith("sqlite") else {},
+engine_options = (
+    {"connect_args": {"check_same_thread": False}}
+    if settings.database_url.startswith("sqlite")
+    else {
+        "pool_pre_ping": True,
+        "pool_size": 5,
+        "max_overflow": 5,
+    }
 )
+engine = create_engine(settings.database_url, **engine_options)
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 
@@ -33,6 +39,6 @@ def initialize_database() -> None:
 
     Base.metadata.create_all(bind=engine)
     with Session(engine) as session:
-        if not session.get(Watchlist, "core"):
+        if settings.seed_demo_data and not session.get(Watchlist, "core"):
             session.add(Watchlist(id="core", name="Core watchlist", symbols="AAPL,MSFT,NVDA,SPY"))
             session.commit()

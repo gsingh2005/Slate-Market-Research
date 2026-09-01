@@ -1,6 +1,11 @@
+"use client";
+
 import Link from "next/link";
-import { PriceChart } from "../../../components/price-chart";
-import { api, type Research } from "../../../lib/api";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+
+import { type ApiError, api, type Research } from "../lib/api";
+import { PriceChart } from "./price-chart";
 
 const format = (value?: number, digits = 1) =>
   value === undefined
@@ -8,24 +13,35 @@ const format = (value?: number, digits = 1) =>
     : new Intl.NumberFormat("en-US", { maximumFractionDigits: digits }).format(value);
 const percent = (value?: number) =>
   value === undefined ? "-" : `${value >= 0 ? "+" : ""}${(value * 100).toFixed(1)}%`;
-export default async function ResearchPage({ params }: { params: Promise<{ symbol: string }> }) {
-  const { symbol } = await params;
-  let data: Research | null = null;
-  try {
-    data = await api<Research>(`/research/${symbol}`);
-  } catch {}
-  if (!data)
+
+export function ResearchView() {
+  const searchParams = useSearchParams();
+  const symbol = (searchParams.get("symbol") || "AAPL").trim().toUpperCase();
+  const [data, setData] = useState<Research | null>(null);
+  const [error, setError] = useState<ApiError | null>(null);
+
+  useEffect(() => {
+    setData(null);
+    setError(null);
+    api<Research>(`research/${encodeURIComponent(symbol)}`)
+      .then(setData)
+      .catch(setError);
+  }, [symbol]);
+
+  if (error) {
+    return <Unavailable symbol={symbol} message={error.message} />;
+  }
+  if (!data) {
     return (
       <main className="card p-8">
-        <p className="label">No coverage</p>
-        <h1 className="mt-2 font-['Instrument_Serif'] text-5xl">
-          {symbol.toUpperCase()} is not available.
-        </h1>
-        <Link href="/" className="mt-6 inline-block text-sm font-bold text-[#1f6b4f]">
-          Return to research
-        </Link>
+        <p className="label">Loading research</p>
+        <p className="mt-2 text-sm text-[#6e7d75]">
+          Requesting current provider data for {symbol}.
+        </p>
       </main>
     );
+  }
+
   const metrics = [
     ["Last", `$${format(data.metrics.last_price, 2)}`],
     ["1 month", percent(data.metrics.return_1m)],
@@ -108,7 +124,7 @@ export default async function ResearchPage({ params }: { params: Promise<{ symbo
                 <div key={key}>
                   <p className="text-[#6e7d75]">{key.replaceAll("_", " ")}</p>
                   <p className="mono mt-1">
-                    {(typeof value === "number" && key.includes("margin")) || key.includes("growth")
+                    {key.includes("margin") || key.includes("growth")
                       ? percent(value as number)
                       : format(value as number, 2)}
                   </p>
@@ -128,6 +144,21 @@ export default async function ResearchPage({ params }: { params: Promise<{ symbo
           </div>
         </div>
       </section>
+    </main>
+  );
+}
+
+function Unavailable({ symbol, message }: { symbol: string; message: string }) {
+  return (
+    <main className="card p-8">
+      <p className="label">Research unavailable</p>
+      <h1 className="mt-2 font-['Instrument_Serif'] text-5xl">{symbol}</h1>
+      <p className="mt-4 max-w-xl text-sm leading-6 text-[#6e7d75]">
+        {message} Slate does not substitute demo values when a configured API cannot be reached.
+      </p>
+      <Link href="/providers" className="mt-6 inline-block text-sm font-bold text-[#1f6b4f]">
+        Review data provider status
+      </Link>
     </main>
   );
 }

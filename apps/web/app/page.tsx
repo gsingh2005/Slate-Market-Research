@@ -45,7 +45,7 @@ export default function Home() {
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {ideas.map((symbol) => (
             <Link
-              href={`/research/${symbol}`}
+              href={`/research/?symbol=${symbol}`}
               key={symbol}
               className="card p-4 transition hover:-translate-y-1"
             >

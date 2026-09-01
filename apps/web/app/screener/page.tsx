@@ -1,5 +1,10 @@
+"use client";
+
 import Link from "next/link";
-import { api } from "../../lib/api";
+import { useEffect, useState } from "react";
+
+import { type ApiError, api } from "../../lib/api";
+
 type Row = {
   symbol: string;
   name: string;
@@ -10,11 +15,15 @@ type Row = {
   momentum_score: number;
   rsi: number;
 };
-export default async function Screener() {
-  let rows: Row[] = [];
-  try {
-    rows = await api<Row[]>("/screener");
-  } catch {}
+
+export default function Screener() {
+  const [rows, setRows] = useState<Row[]>([]);
+  const [error, setError] = useState<ApiError | null>(null);
+
+  useEffect(() => {
+    api<Row[]>("screener").then(setRows).catch(setError);
+  }, []);
+
   return (
     <main>
       <p className="label">Systematic discovery</p>
@@ -23,40 +32,48 @@ export default async function Screener() {
         A transparent ranking across the built-in coverage universe. Scores are calculated from the
         same indicators shown in each research view.
       </p>
-      <div className="card mt-7 overflow-x-auto">
-        <table className="w-full min-w-[720px] text-left text-sm">
-          <thead className="border-b border-[#d7d9ce] text-[10px] uppercase tracking-[.12em] text-[#6e7d75]">
-            <tr>
-              <th className="p-4">Symbol</th>
-              <th>Company</th>
-              <th>Sector</th>
-              <th>Last</th>
-              <th>3M return</th>
-              <th>Volatility</th>
-              <th>RSI</th>
-              <th>Score</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr className="border-b border-[#e6e6df] last:border-0" key={row.symbol}>
-                <td className="p-4 mono font-bold text-[#1f6b4f]">
-                  <Link href={`/research/${row.symbol}`}>{row.symbol}</Link>
-                </td>
-                <td>{row.name}</td>
-                <td className="text-[#6e7d75]">{row.sector}</td>
-                <td>${row.last_price.toFixed(2)}</td>
-                <td className={row.return_3m >= 0 ? "text-[#1f6b4f]" : "text-[#c34b32]"}>
-                  {(row.return_3m * 100).toFixed(1)}%
-                </td>
-                <td>{(row.volatility * 100).toFixed(1)}%</td>
-                <td>{row.rsi.toFixed(0)}</td>
-                <td className="mono font-bold">{row.momentum_score.toFixed(1)}</td>
+      {error ? (
+        <div className="card mt-7 p-6 text-sm leading-6 text-[#6e7d75]">
+          {error.message} No sample results are substituted for an unavailable configured API.
+        </div>
+      ) : rows.length === 0 ? (
+        <div className="card mt-7 p-6 text-sm text-[#6e7d75]">Loading current screener data.</div>
+      ) : (
+        <div className="card mt-7 overflow-x-auto">
+          <table className="w-full min-w-[720px] text-left text-sm">
+            <thead className="border-b border-[#d7d9ce] text-[10px] uppercase tracking-[.12em] text-[#6e7d75]">
+              <tr>
+                <th className="p-4">Symbol</th>
+                <th>Company</th>
+                <th>Sector</th>
+                <th>Last</th>
+                <th>3M return</th>
+                <th>Volatility</th>
+                <th>RSI</th>
+                <th>Score</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr className="border-b border-[#e6e6df] last:border-0" key={row.symbol}>
+                  <td className="p-4 mono font-bold text-[#1f6b4f]">
+                    <Link href={`/research/?symbol=${row.symbol}`}>{row.symbol}</Link>
+                  </td>
+                  <td>{row.name}</td>
+                  <td className="text-[#6e7d75]">{row.sector}</td>
+                  <td>${row.last_price.toFixed(2)}</td>
+                  <td className={row.return_3m >= 0 ? "text-[#1f6b4f]" : "text-[#c34b32]"}>
+                    {(row.return_3m * 100).toFixed(1)}%
+                  </td>
+                  <td>{(row.volatility * 100).toFixed(1)}%</td>
+                  <td>{row.rsi.toFixed(0)}</td>
+                  <td className="mono font-bold">{row.momentum_score.toFixed(1)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </main>
   );
 }

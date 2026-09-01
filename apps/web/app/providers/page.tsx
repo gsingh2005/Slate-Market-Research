@@ -1,8 +1,13 @@
+import { ProviderDiagnostics } from "../../components/provider-diagnostics";
+
 export default function Providers() {
   return (
     <main>
       <p className="label">Data integrity</p>
       <h1 className="font-['Instrument_Serif'] text-6xl tracking-[-.05em]">Provider posture</h1>
+      <div className="mt-6">
+        <ProviderDiagnostics />
+      </div>
       <div className="mt-7 grid gap-4 md:grid-cols-2">
         {[
           [
@@ -29,7 +34,7 @@ export default function Providers() {
           <article className="card p-6" key={title}>
             <p className="label">{label}</p>
             <h2 className="mt-2 font-['Instrument_Serif'] text-3xl">{title}</h2>
-            <p className="mt-3 text-sm leading-6 text-[#6e7d75]">{body}</p>
+            <p className="mt-3 text-sm leading-6 muted">{body}</p>
           </article>
         ))}
       </div>

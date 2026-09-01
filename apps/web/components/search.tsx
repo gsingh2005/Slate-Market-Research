@@ -6,12 +6,12 @@ export function SymbolSearch() {
   const router = useRouter();
   function submit(event: FormEvent) {
     event.preventDefault();
-    router.push(`/research/${symbol.toUpperCase().trim()}`);
+    router.push(`/research/?symbol=${encodeURIComponent(symbol.toUpperCase().trim())}`);
   }
   return (
     <form
       onSubmit={submit}
-      className="flex w-full max-w-md overflow-hidden rounded-xl border border-[#c7cbbd] bg-white"
+      className="theme-surface flex w-full max-w-md overflow-hidden rounded-xl border"
     >
       <input
         aria-label="Ticker symbol"
@@ -19,7 +19,10 @@ export function SymbolSearch() {
         onChange={(event) => setSymbol(event.target.value)}
         className="min-w-0 flex-1 bg-transparent px-4 py-3 text-sm font-bold uppercase outline-none"
       />
-      <button type="submit" className="bg-[#16231f] px-4 text-sm font-bold text-white">
+      <button
+        type="submit"
+        className="bg-[var(--accent)] px-4 text-sm font-bold text-[var(--page)] hover:bg-[var(--accent-hover)]"
+      >
         Research
       </button>
     </form>

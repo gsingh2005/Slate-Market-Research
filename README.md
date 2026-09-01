@@ -47,15 +47,15 @@ python3 -m venv .venv
 npm --prefix apps/web ci
 ```
 
-### Start the backend
+### Start the backend locally
 
 ```bash
-.venv/bin/uvicorn app.main:app --app-dir apps/api --reload
+./.venv/bin/uvicorn app.main:app --app-dir apps/api --host 0.0.0.0 --port 8000 --reload
 ```
 
 API documentation is available at `http://localhost:8000/docs`.
 
-### Start the frontend
+### Start the frontend locally
 
 ```bash
 npm --prefix apps/web run dev
@@ -73,17 +73,16 @@ The Compose setup runs the API in offline mode and exposes the UI on port 3000. 
 
 ## Environment configuration
 
-Copy `.env.example` and keep the resulting `.env` private. `NEXT_PUBLIC_API_URL` is intentionally browser-exposed and must contain only a credential-free API base URL. Provider credentials such as `SLATE_ALPHA_VANTAGE_KEY`, `SLATE_FRED_API_KEY`, and `SLATE_SEC_USER_AGENT` are backend-only and optional.
+Copy `.env.example` and keep the resulting `.env` private. `NEXT_PUBLIC_API_URL` is intentionally browser-exposed and must contain only a credential-free API base URL. Provider credentials such as `ALPHA_VANTAGE_API_KEY`, `FRED_API_KEY`, and `SEC_USER_AGENT` are backend-only and optional.
 
-`SLATE_ENV=production` requires both `SLATE_DATABASE_URL` and explicit `SLATE_ALLOWED_ORIGINS`; wildcard origins are rejected at startup. Keep `SLATE_OFFLINE_MODE=true` for demos, tests, and CI. Live provider adapters remain disabled until implemented and configured.
+`APP_ENV=production` requires both `DATABASE_URL` and explicit `ALLOWED_ORIGINS`; wildcard origins are rejected at startup. Keep `SLATE_OFFLINE_MODE=true` for demos, tests, and CI. Live provider adapters remain disabled until implemented and configured.
 
 ## Database and migrations
 
 The API initializes its local watchlist schema at startup. For an explicit SQLite migration run:
 
 ```bash
-cd apps/api
-../../.venv/bin/python scripts/apply_migrations.py
+./.venv/bin/python apps/api/scripts/apply_migrations.py
 ```
 
 For PostgreSQL, provide a compatible `SLATE_DATABASE_URL` and use a production migration runner before deployment.
@@ -101,7 +100,7 @@ npm --prefix apps/web run format:check
 npm --prefix apps/web run lint
 npm --prefix apps/web run typecheck
 npm --prefix apps/web test
-npm --prefix apps/web run build
+npm --prefix apps/web run build:pages
 ```
 
 CI runs these checks without live provider calls. It uses deterministic sample data and safe mock public URLs.
@@ -121,7 +120,9 @@ Use a focused branch, run the quality checks above, and describe data-source imp
 
 ## Deployment overview
 
-Build the API and web containers separately or with Docker Compose. Production deployment requires a managed database, explicit browser origins, HTTPS termination, observability, and a review of every live data provider's licensing and rate limits. No deployment workflow is included in this repository.
+Build the API and web containers separately or with Docker Compose. Production deployment requires a managed database, explicit browser origins, HTTPS termination, observability, and a review of every live data provider's licensing and rate limits.
+
+GitHub Pages and Render deployment instructions are in [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ## Known limitations
 
@@ -133,4 +134,3 @@ Build the API and web containers separately or with Docker Compose. Production d
 ## License
 
 No reuse license has been selected. Publishing without a license generally reserves reuse rights, so choose a license deliberately before accepting external contributions or inviting reuse.
-
